@@ -13,6 +13,8 @@ class CreateNoticiasTable extends Migration
      */
     public function up()
     {
+        
+        // criação da tabela no banco
         Schema::create('noticias', function (Blueprint $table) {
             $table->increments('id_noticia');
             $table->string('titulo');
