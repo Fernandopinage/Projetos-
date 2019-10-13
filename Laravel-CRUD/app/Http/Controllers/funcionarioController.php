@@ -3,100 +3,161 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\funcionario;
+
 
 class funcionarioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+        // tela de login
     public function index()
     {
-        //
+        //rota para index tela de login
 
         return view('index');
+
+        //------------------------------------------------  
     }
+
+
+
+    public function validaLogin(Request $request){
+
+        // metodo para validar o login
+
+        $this->validate($request,[
+
+            'nome'=>'required',
+            'password'=>'required'
+
+        ]);
+
+        
+        // select da funçao    
+        $dados = funcionario::where('nome',$request->nome)->first();   
+        // se tiver um login cai na condição
+        if($dados){
+           // se tiver senha corretar cai na condiçao
+                if(Hash::check($request->password, $dados->senha)){
+
+                    return redirect('home');
+                    
+                }else{
+
+            
+            return view('index');
+           }
+
+           return view('index');
+        }
+        return view('index');
+        //------------------------------------------------  
+    }
+
 
     // funçao da pagina criar novo funcionario
     public function createF(){
 
-       
+       //rota para abrir uma pagina de cadastro usuario 
         return view('newfuncionario');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
+
+
+        //validar formulario de novo funcionario
+
+        $this->validate($request,[
+
+            'nome'=>'required',
+            'password'=>'required',
+            'email'=>'required',
+            'email2'=>'required|email'
+
+        ]);
+     
+        //------------------------------------------------   
+
+        //medoto para verifica nome email repeditos
+
+        $dados = funcionario::where('nome',"=",$request->nome)->orwhere('email',"=",$request->email)->get();
+
+        if($dados->count()>0){
+            $erros_m = ['Nome ou Email já existe'];
+            return view('newfuncionario',compact('erros_m'));
+        }
+
+
+        //------------------------------------------------
+
+
         //metodo de cadastro o novo funcionario
 
         $dados = new funcionario;
 
         $dados->nome = $request->nome;
-        $dados->senha = $request->Password;
-        $dados->status = $request->select;
+        $dados->senha = Hash::make($request->password);
+        $dados->email = $request->email;
         $dados->save();
-        
+        return view('index');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function destroy($id)
     {
         //
     }
+
+    public function recuperaConta(){
+
+        //rota de metodo para recupera conta 
+
+        return view('recuperaConta');
+        //------------------------------------------------
+    }
+
+    public function validarecuperaConta(Request $request){
+
+        // validando o campo email 
+
+        $this->validate($request,[
+
+            'email'=>'required'
+        ]);
+
+
+        
+        return redirect('/');
+    }
+
+    public function home (){
+
+        return "text1";
+    }
+
 }
